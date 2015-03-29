@@ -3,8 +3,9 @@ This is a simple GNU "Make" command implementation in haskell. I aim to get my h
 
 ## Build Steps:
 clone the repo; cd haskell-make;
-$ cabal sandbox init
-$ cabal build
+    
+    $ cabal sandbox init
+    $ cabal build
 
 ## Current status:
 - parses the Makefile and creates a dependency tree. 
