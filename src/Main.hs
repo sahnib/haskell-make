@@ -7,5 +7,5 @@ main :: IO()
 main =
   do handle <- openFile "Makefile" ReadMode
      contents <- hGetContents handle
-     hClose handle
      putStrLn $ show $ parse makefile "make::" contents
+     hClose handle

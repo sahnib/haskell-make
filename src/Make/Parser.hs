@@ -8,8 +8,7 @@ where
 
 import Text.ParserCombinators.Parsec
 import Make.Primitives
-
--- 
+ 
 -- Returns the complete list of Rules
 makefile :: GenParser Char st [Rule]
 makefile =
@@ -21,15 +20,12 @@ makefile =
 parseRule :: GenParser Char st Rule
 parseRule =
   do t <- parseTarget
+     char ':'
      s <- parseSources
      eol
      cmds <- parseCommands
+     spaces
      return Rule {target = t, sources = s, commands = cmds}
-
-isSpace :: Char -> Bool
-isSpace ' ' = True
-isSpace '\t' = True
-isSpace _ = False
 
 --Parses a newLine
 eol :: GenParser Char st Char
@@ -37,17 +33,21 @@ eol = char '\n'
 
 parseTarget :: GenParser Char st Target
 parseTarget =
-  many (noneOf ":\n")
+  many (noneOf ":")
 
 parseSources :: GenParser Char st [Source]
 parseSources =
-  do result <- many (satisfy(\c -> isSpace c) >> parseSource)
-     eol
-     return result
+  do
+    many (char ' ' >> parseSource)
+    <|> (return [])
 
 parseSource :: GenParser Char st Source
 parseSource =
-  many alphaNum
+  do
+    -- Skip Whitespace characters at the beginning
+    many (oneOf " \t")
+    s <- many (noneOf " \n\t")
+    return s
 
 parseCommands :: GenParser Char st [String]
 parseCommands =
