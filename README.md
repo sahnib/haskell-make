@@ -14,3 +14,10 @@ You need at least GHC 7.8 to build the project.
 
 ## Current status:
 - parses the Makefile and creates a dependency tree. 
+- builds the "all" target and all its dependencies. 
+
+## TODO:
+- add test suite. 
+- add timestamp recognition and build targets accordingly.
+- add support for variable declarations. 
+- add support for comments in Makefile. 
