@@ -51,12 +51,13 @@ parseSource =
 
 parseCommands :: GenParser Char st [String]
 parseCommands =
-  do
-    -- A command has to start with a tab character to be included in this rule
-    -- else we return an empty list
-    many (char '\t' >> parseCommand)
-    <|> (return [])
+  many (command)
+  <|> (return [])
 
-parseCommand :: GenParser Char st String
-parseCommand =
-  many (noneOf "\n")
+command :: GenParser Char st String
+command =
+  do
+    char '\t'
+    cmd <- many(noneOf "\n")
+    char '\n'
+    return cmd
