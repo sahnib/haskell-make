@@ -3,13 +3,16 @@
 module Make.DependencyBuilder
 (
   ruleForTarget,
-  execute
+  execute,
+  hasExpired,
+  isOld
 ) where 
 
 import Make.Primitives
 import System.Cmd
 import System.Exit
 import System.Directory
+import System.Posix.Files
 
 ruleForTarget :: Target -> [Rule] -> Maybe Rule
 ruleForTarget t [] = Nothing
@@ -26,6 +29,16 @@ runCommands (x:xs) =
     case exitCode of ExitSuccess -> runCommands xs
                      ExitFailure a -> return $ ExitFailure a
 
+isOld :: String -> [String] -> IO Bool
+isOld targetFile sourcesFiles =
+  do
+    targetFS <- getFileStatus targetFile
+    sourcesFS <- sequence $ (map getFileStatus sourcesFiles)
+    let t1 = modificationTime targetFS
+    let t2 = map modificationTime sourcesFS
+    let retVal = (or $ map (>t1) t2)
+    return retVal
+
 -- Returns a true if target is older than the sources
 hasExpired :: Rule -> IO Bool
 hasExpired rule =
@@ -34,7 +47,7 @@ hasExpired rule =
     sourcesPresentList <- sequence $ map doesFileExist (sources rule)
     let allSourcesPresent = and sourcesPresentList
     if (targetPresent && allSourcesPresent) then
-      return False
+      (isOld (target rule) (sources rule))
     else
       return True
 
